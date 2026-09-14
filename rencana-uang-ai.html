@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RencanaUang AI — Artha</title>
+<style>
+:root{
+  --green:#24b866;--green-dark:#08251b;--green-soft:#e9f8ee;
+  --yellow:#ffd477;--ink:#10251d;--muted:#718078;--line:#e3ebe5;
+  --bg:#f7faf8;--white:#fff;--danger:#dc5b5b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--green-dark);color:white;padding:25px 18px;position:fixed;inset:0 auto 0 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:23px;margin:4px 10px 35px}
+.logo{width:42px;height:42px;border:3px solid var(--green);border-radius:15px;display:grid;place-items:center;color:var(--green);font-size:22px;background:#12392b}
+.nav button{display:block;width:100%;padding:13px 14px;margin:7px 0;text-align:left;border-radius:13px;background:transparent;color:#c8d8cf}
+.nav button.active,.nav button:hover{background:#1c4936;color:#fff}
+.side-note{position:absolute;bottom:25px;left:22px;right:22px;padding:15px;border:1px solid #315442;border-radius:15px;color:#c8d8cf;font-size:12px}
+main{margin-left:245px;width:calc(100% - 245px);padding:28px;max-width:1500px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
+.eyebrow{color:var(--green);font-weight:800;letter-spacing:1.5px;font-size:12px}
+h1{font-size:34px;line-height:1.15;margin:7px 0}
+h2{margin:0 0 5px;font-size:22px}
+p{color:var(--muted);line-height:1.6;margin:6px 0}
+.pill{background:var(--green-soft);color:#16874b;border-radius:99px;padding:10px 15px;font-weight:700;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:21px;box-shadow:0 8px 24px #173e2510}
+.stat-title{color:var(--muted);font-size:13px;font-weight:700}
+.stat-value{font-size:27px;font-weight:850;margin-top:10px}
+.stat-icon{font-size:22px;margin-bottom:14px}
+.green{color:var(--green)}.red{color:var(--danger)}.yellow{color:#bd8a16}
+.layout{display:grid;grid-template-columns:1.35fr 1fr;gap:18px}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.btn{background:var(--green);color:white;padding:12px 17px;border-radius:12px;font-weight:800}
+.btn.secondary{background:var(--green-soft);color:#148348}
+.btn.dark{background:var(--green-dark)}
+.btn.small{padding:8px 11px;font-size:12px}
+.chart{height:235px;display:flex;align-items:end;gap:18px;padding:20px 10px 5px;border-bottom:1px solid var(--line)}
+.bar-group{flex:1;display:flex;align-items:end;justify-content:center;gap:5px;height:100%;position:relative}
+.bar{width:28px;border-radius:8px 8px 0 0;min-height:3px}
+.bar.income{background:#9be5b8}.bar.expense{background:var(--green)}
+.bar-label{position:absolute;bottom:-28px;font-size:12px;color:var(--muted)}
+.legend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-top:28px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.budget-item{margin:18px 0}.budget-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:750}
+.track{height:10px;background:#edf2ee;border-radius:99px;overflow:hidden;margin-top:9px}
+.fill{height:100%;background:var(--green);border-radius:99px}
+.fill.over{background:var(--danger)}
+.transaction{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.transaction:last-child{border-bottom:0}
+.tx-left{display:flex;gap:12px;align-items:center}.tx-icon{width:40px;height:40px;border-radius:13px;background:var(--green-soft);display:grid;place-items:center}
+.tx-name{font-weight:750;font-size:14px}.tx-meta{font-size:12px;color:var(--muted);margin-top:3px}
+.amount{font-weight:850;white-space:nowrap}.amount.expense{color:var(--danger)}.amount.income{color:var(--green)}
+.page{display:none}.page.active{display:block}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}
+input,select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none}
+input:focus,select:focus{border-color:var(--green)}
+.full{grid-column:1/-1}
+.notice{background:#fff7df;border:1px solid #f3dda2;border-radius:15px;padding:15px;margin:15px 0;color:#7c611b;font-size:13px}
+.ai{background:linear-gradient(135deg,#eaf9ef,#fff8df);border:1px solid #d8eddd}
+.ai-title{display:flex;align-items:center;gap:10px;font-weight:850}
+.chat{height:280px;overflow:auto;padding:10px 0}
+.msg{max-width:85%;padding:12px 14px;border-radius:15px;margin:9px 0;font-size:14px;line-height:1.5}
+.msg.bot{background:#eef6f0;border-top-left-radius:4px}.msg.user{background:var(--green);color:#fff;margin-left:auto;border-top-right-radius:4px}
+.chat-form{display:flex;gap:8px}.chat-form input{flex:1}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:13px 8px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.empty{text-align:center;padding:30px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#071b12a8;display:none;align-items:center;justify-content:center;padding:20px;z-index:5}.modal.open{display:flex}
+.modal-box{background:white;border-radius:22px;padding:25px;width:min(520px,100%)}
+.close{float:right;background:#eef3ef;border-radius:50%;width:32px;height:32px}
+@media(max-width:950px){.sidebar{width:75px;padding:20px 10px}.brand span,.nav button span,.side-note{display:none}.brand{margin:5px 6px 30px}.nav button{text-align:center;font-size:20px}.sidebar+.x{}main{margin-left:75px;width:calc(100% - 75px);padding:18px}.grid{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
+@media(max-width:550px){h1{font-size:27px}.grid{gap:10px}.card{padding:15px;border-radius:17px}.stat-value{font-size:22px}.topbar{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.chart{gap:6px}.bar{width:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="logo">₿</div><span>RencanaUang</span></div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard">🏠 <span>Dashboard</span></button>
+    <button data-page="transactions">💳 <span>Transaksi</span></button>
+    <button data-page="budget">🎯 <span>Budget</span></button>
+    <button data-page="artha">✨ <span>Artha AI</span></button>
+    <button data-page="settings">⚙️ <span>Pengaturan</span></button>
+  </nav>
+  <div class="side-note">Artha membantu kamu mengatur uang dengan metode <b>Zero-Based Budgeting</b>.</div>
+</aside>
+
+<main>
+<header class="topbar">
+  <div><div class="eyebrow">FINANCIAL COPILOT</div><h1 id="greeting">Halo, Thoriq! 👋</h1><p>Yuk, cek kondisi keuanganmu hari ini.</p></div>
+  <button class="btn" onclick="openModal()">＋ Catat transaksi</button>
+</header>
+
+<section id="dashboard" class="page active">
+  <div class="grid">
+    <div class="card"><div class="stat-icon">💰</div><div class="stat-title">Total Saldo</div><div class="stat-value" id="balance">Rp0</div></div>
+    <div class="card"><div class="stat-icon">📈</div><div class="stat-title">Pemasukan</div><div class="stat-value green" id="income">Rp0</div></div>
+    <div class="card"><div class="stat-icon">📉</div><div class="stat-title">Pengeluaran</div><div class="stat-value red" id="expense">Rp0</div></div>
+    <div class="card"><div class="stat-icon">🎯</div><div class="stat-title">Sisa Budget</div><div class="stat-value yellow" id="remaining">Rp0</div></div>
+  </div>
+  <div class="layout">
+    <div class="card">
+      <div class="section-head"><div><h2>Arus kas</h2><p>Ringkasan pemasukan dan pengeluaran</p></div><span class="pill">Bulan ini</span></div>
+      <div class="chart" id="chart"></div>
+      <div class="legend"><span><i class="dot" style="background:#9be5b8"></i>Pemasukan</span><span><i class="dot" style="background:#24b866"></i>Pengeluaran</span></div>
+    </div>
+    <div class="card ai">
+      <div class="section-head"><div><h2>✨ Saran Artha</h2><p>Insight sederhana untukmu</p></div></div>
+      <p id="insight">Belum ada transaksi. Yuk mulai catat pengeluaran pertamamu.</p>
+      <button class="btn secondary" onclick="showPage('artha')">Ngobrol dengan Artha →</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="section-head"><div><h2>Progress budget</h2><p>Alokasi uang dengan metode zero-based budgeting.</p></div><button class="btn small secondary" onclick="showPage('budget')">Kelola budget</button></div>
+    <div id="budgetPreview"></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="section-head"><h2>Transaksi terbaru</h2><button class="btn small secondary" onclick="showPage('transactions')">Lihat semua</button></div>
+    <div id="recent"></div>
+  </div>
+</section>
+
+<section id="transactions" class="page">
+  <div class="card"><div class="section-head"><div><h2>Semua transaksi</h2><p>Catatan keuangan yang tersimpan di perangkat ini.</p></div><button class="btn" onclick="openModal()">＋ Tambah</button></div><div id="allTransactions"></div></div>
+</section>
+
+<section id="budget" class="page">
+  <div class="card"><div class="section-head"><div><h2>Budget envelopes</h2><p>Atur alokasi setiap kategori sesuai kebutuhanmu.</p></div><button class="btn" onclick="addBudget()">＋ Kategori</button></div><div id="budgetList"></div></div>
+</section>
+
+<section id="artha" class="page">
+  <div class="card ai"><div class="section-head"><div><h2>✨ Artha — AI Financial Copilot</h2><p>Teman finansial yang suportif dan praktis.</p></div></div>
+    <div class="chat" id="chat"><div class="msg bot">Hai! Aku Artha. Kamu bisa cerita seperti “beli kopi 22 ribu” atau tanya tentang budget kamu 😊</div></div>
+    <form class="chat-form" onsubmit="askArtha(event)"><input id="chatInput" placeholder="Contoh: beli makan 20k via cash..." autocomplete="off"><button class="btn">Kirim</button></form>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="card"><h2>Pengaturan profil</h2><p>Data demo tersimpan secara lokal di browser HP kamu.</p><br>
+    <form onsubmit="saveSettings(event)" class="form-grid">
+      <div><label>Nama</label><input id="profileName" required></div><div><label>Saldo awal</label><input id="initialBalance" type="number" min="0" required></div>
+      <div class="full"><button class="btn">Simpan pengaturan</button> <button type="button" class="btn secondary" onclick="resetData()">Reset data demo</button></div>
+    </form>
+    <div class="notice">Catatan: versi satu file ini adalah prototype frontend. Belum terhubung ke database, Telegram, WhatsApp, OpenAI, atau sistem autentikasi sungguhan.</div>
+  </div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-box"><button class="close" onclick="closeModal()">×</button><h2>Catat transaksi</h2><p>Masukkan detail transaksi secara manual.</p><br>
+<form onsubmit="saveTransaction(event)" class="form-grid">
+<div class="full"><label>Deskripsi</label><input id="txDesc" placeholder="Contoh: Beli kopi kenangan" required></div>
+<div><label>Nominal (Rp)</label><input id="txAmount" type="number" min="1" placeholder="22000" required></div>
+<div><label>Jenis</label><select id="txType"><option value="EXPENSE">Pengeluaran</option><option value="INCOME">Pemasukan</option></select></div>
+<div><label>Kategori</label><select id="txCategory"></select></div>
+<div><label>Wallet</label><select id="txWallet"><option>Cash</option><option>Gopay</option><option>OVO</option><option>DANA</option><option>Bank</option></select></div>
+<div class="full"><button class="btn">Simpan transaksi</button></div>
+</form></div></div>
+
+<script>
+const money=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n||0);
+const state=JSON.parse(localStorage.getItem('rencanaUangState')||'null')||{
+ name:'Thoriq',initial:0,
+ transactions:[],
+ budgets:[
+  {name:'Makan Harian',allocated:800000},
+  {name:'Transportasi/Ojol',allocated:300000},
+  {name:'Jajan Kopi',allocated:200000},
+  {name:'Kos & Tagihan',allocated:1000000},
+  {name:'Tabungan',allocated:500000}
+ ]};
+function persist(){localStorage.setItem('rencanaUangState',JSON.stringify(state))}
+function expenses(){return state.transactions.filter(t=>t.type==='EXPENSE').reduce((a,t)=>a+t.amount,0)}
+function incomes(){return state.transactions.filter(t=>t.type==='INCOME').reduce((a,t)=>a+t.amount,0)}
+function spent(cat){return state.transactions.filter(t=>t.type==='EXPENSE'&&t.category===cat).reduce((a,t)=>a+t.amount,0)}
+function render(){
+ document.getElementById('greeting').textContent='Halo, '+state.name+'! 👋';
+ const inc=incomes(), exp=expenses(), allocated=state.budgets.reduce((a,b)=>a+b.allocated,0);
+ document.getElementById('balance').textContent=money(state.initial+inc-exp);
+ document.getElementById('income').textContent=money(inc);
+ document.getElementById('expense').textContent=money(exp);
+ document.getElementById('remaining').textContent=money(allocated-exp);
+ renderChart();renderBudgets();renderTransactions();renderInsight();
+ document.getElementById('profileName').value=state.name;document.getElementById('initialBalance').value=state.initial;
+ document.getElementById('txCategory').innerHTML=state.budgets.map(b=>`<option>${b.name}</option>`).join('');
+}
+function renderChart(){
+ const days=['Sen','Sel','Rab','Kam','Jum','Sab','Min'], now=new Date();
+ const vals=days.map((d,i)=>({inc:0,exp:0}));
+ state.transactions.forEach(t=>{let day=new Date(t.date).getDay();let idx=day===0?6:day-1;if(idx>=0&&idx<7)vals[idx][t.type==='INCOME'?'inc':'exp']+=t.amount});
+ const max=Math.max(1,...vals.flatMap(v=>[v.inc,v.exp]));
+ document.getElementById('chart').innerHTML=vals.map((v,i)=>`<div class="bar-group"><div class="bar income" style="height:${v.inc/max*100}%"></div><div class="bar expense" style="height:${v.exp/max*100}%"></div><span class="bar-label">${days[i]}</span></div>`).join('');
+}
+function budgetHTML(){
+ return state.budgets.map((b,i)=>{let s=spent(b.name),pct=Math.round(s/b.allocated*100)||0;return `<div class="budget-item"><div class="budget-line"><span>${b.name}</span><span>${money(s)} / ${money(b.allocated)}</span></div><div class="track"><div class="fill ${pct>100?'over':''}" style="width:${Math.min(100,pct)}%"></div></div><p style="font-size:12px">${pct>100?'⚠️ Melebihi budget sebesar '+money(s-b.allocated):'Sisa '+money(b.allocated-s)} ${i>=0&&document.getElementById('budgetList')?'':''}</p></div>`}).join('');
+}
+function renderBudgets(){document.getElementById('budgetPreview').innerHTML=budgetHTML();document.getElementById('budgetList').innerHTML=state.budgets.map((b,i)=>`<div class="budget-item"><div class="budget-line"><span>${b.name}</span><span>${money(b.allocated)}</span></div><div style="display:flex;gap:8px;margin-top:8px"><input type="number" min="0" value="${b.allocated}" onchange="changeBudget(${i},this.value)"><button class="btn small secondary" onclick="removeBudget(${i})">Hapus</button></div>${budgetHTMLForOne(b)}</div>`).join('')}
+function budgetHTMLForOne(b){let s=spent(b.name),p=Math.round(s/b.allocated*100)||0;return `<div class="track"><div class="fill ${p>100?'over':''}" style="width:${Math.min(100,p)}%"></div></div><p style="font-size:12px">${money(s)} terpakai dari ${money(b.allocated)}</p>`}
+function renderTransactions(){
+ const tx=state.transactions.slice().reverse();
+ const html=tx.length?tx.map(t=>`<div class="transaction"><div class="tx-left"><div class="tx-icon">${t.type==='INCOME'?'📥':'🧾'}</div><div><div class="tx-name">${escapeHTML(t.desc)}</div><div class="tx-meta">${t.category} · ${t.wallet} · ${new Date(t.date).toLocaleDateString('id-ID')}</div></div></div><div class="amount ${t.type.toLowerCase()}">${t.type==='INCOME'?'+':'−'}${money(t.amount)}</div></div>`).join(''):'<div class="empty">Belum ada transaksi.</div>';
+ document.getElementById('recent').innerHTML=tx.slice(0,5).length?tx.slice(0,5).map(t=>`<div class="transaction"><div class="tx-left"><div class="tx-icon">🧾</div><div><div class="tx-name">${escapeHTML(t.desc)}</div><div class="tx-meta">${t.category} · ${t.wallet}</div></div></div><div class="amount ${t.type.toLowerCase()}">${t.type==='INCOME'?'+':'−'}${money(t.amount)}</div></div>`).join(''):'<div class="empty">Belum ada transaksi.</div>';
+ document.getElementById('allTransactions').innerHTML=html;
+}
+function renderInsight(){
+ const exp=expenses(), top=state.budgets.map(b=>({name:b.name,spent:spent(b.name)})).sort((a,b)=>b.spent-a.spent)[0];
+ document.getElementById('insight').textContent=!state.transactions.length?'Belum ada transaksi. Yuk mulai catat pengeluaran pertamamu.':top&&top.spent?'Kategori '+top.name+' paling banyak digunakan dengan total '+money(top.spent)+'. Coba tentukan batas yang realistis agar budget tetap aman.':'Transaksimu sudah tercatat. Pertahankan kebiasaan mencatat agar keputusan finansial lebih terarah.';
+}
+function openModal(){document.getElementById('modal').classList.add('open');render()}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function saveTransaction(e){e.preventDefault();let t={id:Date.now(),desc:document.getElementById('txDesc').value,amount:Number(document.getElementById('txAmount').value),type:document.getElementById('txType').value,category:document.getElementById('txCategory').value,wallet:document.getElementById('txWallet').value,date:new Date().toISOString()};state.transactions.push(t);persist();closeModal();e.target.reset();render();showPage('dashboard');checkOverbudget(t)}
+function checkOverbudget(t){if(t.type==='EXPENSE'){let b=state.budgets.find(x=>x.name===t.category);if(b&&spent(b.name)>b.allocated)addChat('⚠️ Budget '+b.name+' sudah melebihi alokasi sebesar '+money(spent(b.name)-b.allocated)+'. Pertimbangkan mengurangi pengeluaran atau mengalokasikan ulang budget.');}}
+function addChat(text,who='bot'){document.getElementById('chat').insertAdjacentHTML('beforeend',`<div class="msg ${who}">${escapeHTML(text)}</div>`);document.getElementById('chat').scrollTop=99999}
+function askArtha(e){e.preventDefault();let input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return;addChat(text,'user');input.value='';let m=text.match(/(\d+(?:[.,]\d+)?)\s*(k|rb|ribu|juta)?/i),amount=m?Number(m[1].replace(',','.'))*(/juta/i.test(m[2]||'')?1000000:/k|rb|ribu/i.test(m[2]||'')?1000:1):0;let lower=text.toLowerCase();let cat=state.budgets.find(b=>lower.includes(b.name.toLowerCase().split(' ')[0]));let reply;if(amount){reply='Aku menangkap nominal '+money(amount)+'. Untuk mencatatnya, tekan tombol “Catat transaksi” lalu pastikan kategori dan wallet sudah benar ya.'+(cat?' Kategorinya mungkin '+cat.name+'.':'');}else if(lower.includes('saldo'))reply='Saldo saat ini sekitar '+money(state.initial+incomes()-expenses())+'.';else if(lower.includes('budget'))reply='Total alokasi budget kamu '+money(state.budgets.reduce((a,b)=>a+b.allocated,0))+'. Sisa setelah pengeluaran '+money(state.budgets.reduce((a,b)=>a+b.allocated,0)-expenses())+'.';else reply='Aku bisa membantu membaca nominal, mengecek saldo, dan memberi saran budget. Coba tulis: “beli kopi 22k” atau “berapa saldo aku?”';setTimeout(()=>addChat(reply),300)}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id))}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+function changeBudget(i,v){state.budgets[i].allocated=Number(v)||0;persist();render()}
+function addBudget(){let n=prompt('Nama kategori baru:');if(!n)return;let a=Number(prompt('Alokasi awal (Rp):','0'));state.budgets.push({name:n,allocated:a||0});persist();render()}
+function removeBudget(i){if(confirm('Hapus kategori ini?')){state.budgets.splice(i,1);persist();render()}}
+function saveSettings(e){e.preventDefault();state.name=document.getElementById('profileName').value;state.initial=Number(document.getElementById('initialBalance').value)||0;persist();render();alert('Pengaturan tersimpan.')}
+function resetData(){if(confirm('Hapus seluruh data demo?')){localStorage.removeItem('rencanaUangState');location.reload()}}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+</script>
+</body>
+</html>
